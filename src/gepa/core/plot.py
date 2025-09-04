@@ -12,7 +12,7 @@ def plot_gepa_evolution_tree(optimized_results_dict: Dict[str, Any],
                            save_path: str = None,
                            title: str = "GEPA Evolution Tree") -> plt.Figure:
     """
-    Plot GEPA evolution tree similar to the React EvolutionTree component.
+    Plot GEPA evolution tree
     
     Args:
         optimized_results_dict: Dictionary from optimized_results.to_dict()
@@ -216,7 +216,7 @@ def plot_gepa_evolution_tree(optimized_results_dict: Dict[str, Any],
         print(f"Evolution tree saved to: {save_path}")
     
     plt.show()
-    
+
     return fig
 
 def print_evolution_summary(optimized_results_dict: Dict[str, Any]):
