@@ -9,6 +9,9 @@ from gepa.logging.utils import log_detailed_metrics_after_discovering_new_progra
 from gepa.logging.wandb_utils import initialize_wandb
 from gepa.proposer.merge import MergeProposer
 from gepa.proposer.reflective_mutation.reflective_mutation import ReflectiveMutationProposer
+from gepa.core.result import GEPAResult
+from gepa.core.plot import plot_gepa_evolution_tree
+
 
 from .adapter import DataInst, RolloutOutput, Trajectory
 
@@ -45,6 +48,7 @@ class GEPAEngine(Generic[DataInst, Trajectory, RolloutOutput]):
         track_best_outputs: bool = False,
         display_progress_bar: bool = False,
         raise_on_exception: bool = True,
+        plotting_steps: int | None = None
     ):
         # Budget constraint: max_metric_calls must be set
         assert max_metric_calls is not None, "max_metric_calls must be set"
@@ -74,6 +78,8 @@ class GEPAEngine(Generic[DataInst, Trajectory, RolloutOutput]):
         self.display_progress_bar = display_progress_bar
 
         self.raise_on_exception = raise_on_exception
+
+        self.plotting_steps = plotting_steps
 
     def _val_evaluator(self) -> Callable[[dict[str, str]], tuple[list[RolloutOutput], list[float]]]:
         assert self.valset is not None
@@ -176,6 +182,9 @@ class GEPAEngine(Generic[DataInst, Trajectory, RolloutOutput]):
                 progress_bar.update(delta)
                 last_pbar_val = state.total_num_evals
 
+            if self.plotting_steps and state.i % self.plotting_steps == 0:
+                plot_gepa_evolution_tree(GEPAResult.from_state(state).to_dict())
+            
             assert state.is_consistent()
             try:
                 state.save(self.run_dir)
